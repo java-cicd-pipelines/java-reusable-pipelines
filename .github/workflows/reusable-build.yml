@@ -11,8 +11,8 @@ on:
         type: string
         description: 'Versão do Maven a ser usada'
         required: true
+    secrets:
       SONAR_TOKEN:
-        type: string
         description: 'Token de autenticação do SonarQube'
         required: true
 
