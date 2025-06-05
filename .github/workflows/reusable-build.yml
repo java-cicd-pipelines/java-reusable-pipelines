@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Garante que todo o histórico do repositório seja baixado
 
       - name: Configurar JDK 
         uses: actions/setup-java@v4
