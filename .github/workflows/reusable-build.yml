@@ -7,7 +7,6 @@ on:
         description: 'Versão do Java a ser usada'
         type: string
         required: true
-        default: '17'
       maven_version:
         type: string
         description: 'Versão do Maven a ser usada'
