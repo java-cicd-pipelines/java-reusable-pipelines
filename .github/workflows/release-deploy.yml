@@ -1,0 +1,30 @@
+# on:
+#   workflow_call:
+
+# jobs:
+#   release:
+#     runs-on: windows-latest
+#     steps:
+
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Download Build Artifacts
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: Build-Artifacts
+#           path: ./artifacts
+
+#       - name: Verificar conteúdo da pasta artifacts
+#         run: |
+#           echo "Arquivos encontrados:"
+#           dir artifacts /s
+#         shell: cmd
+
+#       - name: Create GitHub Release with Assets
+#         uses: softprops/action-gh-release@v1
+#         with:
+#           tag_name: v1.0.0
+#           files: artifacts/**/*
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,88 @@
+# on:
+#   workflow_call:
+#     inputs:
+#       build_configuration:
+#         description: 'Configuração de build (Debug ou Release)'
+#         required: true
+#         default: 'Release'
+#         type: string
+#     secrets:
+#       SONAR_TOKEN:
+#         description: 'Token do SonarQube'
+#         required: true
+      
+
+# jobs:
+#   build:
+#     runs-on: windows-latest
+
+#     steps:
+#     # Checkout the code from the repository
+#     - name: Checkout code
+#       uses: actions/checkout@v4
+
+#     # Setup MSBuild
+#     - name: Setup MSBuild
+#       uses: microsoft/setup-msbuild@v2
+
+#     # Build the project
+#     - name: Build solution
+#       run: |
+#         $solution = Get-ChildItem -Path . -Recurse -Filter "*.sln" | Select-Object -First 1
+#         if ($null -eq $solution) {
+#           Write-Error "Nenhum arquivo .sln encontrado no repositório."
+#         }
+#         msbuild $solution.FullName /p:Configuration=${{ inputs.build_configuration }}
+#       shell: pwsh
+#       continue-on-error: false
+
+#     # Run unit tests
+#     - name: Run tests
+#       run: |
+#         $testProjects = Get-ChildItem -Path . -Recurse -Filter "*.csproj" | Where-Object { $_.FullName -match "\.Tests\.csproj$" }
+#         foreach ($project in $testProjects) {
+#           dotnet test $project.FullName --configuration=${{ inputs.build_configuration }}
+#         }
+#       shell: pwsh
+
+#     # Setup NuGet
+#     - name: Setup NuGet
+#       uses: NuGet/setup-nuget@v2
+
+#     # Oficial SonarQube Scan
+#     - name: Oficial SonarQube Scan
+#       uses: sonarsource/sonarqube-scan-action@v5.2.0
+#       env:
+#         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#       with:
+#         args: >
+#          -Dsonar.organization='migracaodotnetforms'
+#          -Dsonar.projectKey=${{ github.event.repository.name }}
+#          -Dsonar.verbose=true
+#          -Dsonar.exclusions=**/bin/**/*,**/obj/**/*,**/packages/**/*,**/test/**/*
+
+#     # Save artifacts
+#     - name: Zip all build outputs
+#       run: |
+#         $zipPath = "build-artifacts.zip"
+#         $outputDirs = Get-ChildItem -Path . -Recurse -Directory -Filter "bin" | ForEach-Object {
+#           "$($_.FullName)\${{ inputs.build_configuration }}"
+#         } | Where-Object { Test-Path $_ }
+
+#         if (-not $outputDirs) {
+#           Write-Error "Nenhum diretório de build encontrado."
+#         }
+
+#         Compress-Archive -Path $outputDirs -DestinationPath $zipPath
+#       shell: pwsh
+
+
+#     # Upload artifacts
+#     - name: Upload Build Artifacts
+#       uses: actions/upload-artifact@v4
+#       with:
+#         name: Build-Artifacts
+#         path: build-artifacts.zip
+
+
+
