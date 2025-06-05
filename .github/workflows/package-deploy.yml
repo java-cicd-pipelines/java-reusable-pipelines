@@ -1,53 +1,35 @@
-# on:
-#   workflow_call:
-#     inputs:
-#       build_configuration:
-#         description: 'Configuração de build (Debug ou Release)'
-#         required: true
-#         default: 'Release'
-#         type: string
+on:
+  workflow_call:
+    inputs:
+      build_configuration:
+        description: 'Configuração de build (Debug ou Release)'
+        required: true
+        default: 'Release'
+        type: string
+jobs:
+    checkout:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout código
+          uses: actions/checkout@v4
+
+        - name: dowload java artifacts
+          uses: actions/download-artifact@v4
+          with:
+           name: java-artifacts
+
+        - name: Configurar Github Packages
+          run: mvn deploy
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+     - name: Build da imagem Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
    
-# jobs:
-#   package-deploy:
-#     runs-on: windows-latest
-#     steps:
-#       # Checkout the repository
-#     # - name: Checkout code
-#       uses: actions/checkout@v4
-
-#     - name: Download NuGet CLIi
-#       run: |
-#          curl -L --fail https://dist.nuget.org/win-x86-commandline/latest/nuget.exe --output nuget.exe
-
-#       # Setup MSBuild
-#     - name: Setup MSBuild
-#       uses: microsoft/setup-msbuild@v2
+    
+      
    
-#      # Build the project
-#     - name: Build solution
-#       run: |
-#         $solution = Get-ChildItem -Path . -Recurse -Filter "*.sln" | Select-Object -First 1
-#         if ($null -eq $solution) {
-#           Write-Error "Nenhum arquivo .sln encontrado no repositório."
-#         }
-#         msbuild $solution.FullName /p:Configuration=${{ inputs.build_configuration }}
-#       shell: pwsh
-#       continue-on-error: false
-     
-#       # pack the NuGet package
-#     - name: Pack NuGet package
-#       run: |
-#         $project = Get-ChildItem -Path . -Recurse -Filter "*.csproj" | Select-Object -First 1
-#         if ($null -eq $project) {
-#           Write-Error "Nenhum arquivo .csproj encontrado no repositório."
-#         }
-#         ./nuget.exe pack $project.FullName -Properties Configuration=${{ inputs.build_configuration }} -OutputDirectory ./nupkg -Build
-
-#       # Authenticate and Publish to GitHub Packages
-#     - name: Authenticate and Publish to GitHub Packages
-#       run: |
-#        nuget.exe sources add -Name "github" -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" -Username ${{ github.actor }} -Password ${{ secrets.GITHUB_TOKEN }}
-#        nuget.exe push **/*.nupkg -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" -ApiKey ${{ secrets.GITHUB_TOKEN }} -SkipDuplicate
-#       shell: pwsh
-#       env:
-#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

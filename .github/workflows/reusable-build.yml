@@ -1,88 +1,62 @@
-# on:
-#   workflow_call:
-#     inputs:
-#       build_configuration:
-#         description: 'Configuração de build (Debug ou Release)'
-#         required: true
-#         default: 'Release'
-#         type: string
-#     secrets:
-#       SONAR_TOKEN:
-#         description: 'Token do SonarQube'
-#         required: true
+name: Java Reusable Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      java_version:
+        description: 'Versão do Java a ser usada'
+        required: true
+        default: '17'
+      maven_version:
+        description: 'Versão do Maven a ser usada'
+        required: true
       
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-# jobs:
-#   build:
-#     runs-on: windows-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
 
-#     steps:
-#     # Checkout the code from the repository
-#     - name: Checkout code
-#       uses: actions/checkout@v4
+      - name: Configurar JDK 
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ inputs.java_version }}
 
-#     # Setup MSBuild
-#     - name: Setup MSBuild
-#       uses: microsoft/setup-msbuild@v2
+      - name: Instalar Maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: ${{inputs.maven_version}}
 
-#     # Build the project
-#     - name: Build solution
-#       run: |
-#         $solution = Get-ChildItem -Path . -Recurse -Filter "*.sln" | Select-Object -First 1
-#         if ($null -eq $solution) {
-#           Write-Error "Nenhum arquivo .sln encontrado no repositório."
-#         }
-#         msbuild $solution.FullName /p:Configuration=${{ inputs.build_configuration }}
-#       shell: pwsh
-#       continue-on-error: false
+      - name: Executar testes (unitários e integração)
+        run: mvn clean verify
 
-#     # Run unit tests
-#     - name: Run tests
-#       run: |
-#         $testProjects = Get-ChildItem -Path . -Recurse -Filter "*.csproj" | Where-Object { $_.FullName -match "\.Tests\.csproj$" }
-#         foreach ($project in $testProjects) {
-#           dotnet test $project.FullName --configuration=${{ inputs.build_configuration }}
-#         }
-#       shell: pwsh
+      - name: Análise com SonarQube
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.projectKey=${{ github.repository }} \
+            -Dsonar.organization=${{ github.repository_owner }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=$SONAR_TOKEN
 
-#     # Setup NuGet
-#     - name: Setup NuGet
-#       uses: NuGet/setup-nuget@v2
+      - name: Build do projeto (gera JAR)
+        run: mvn package
 
-#     # Oficial SonarQube Scan
-#     - name: Oficial SonarQube Scan
-#       uses: sonarsource/sonarqube-scan-action@v5.2.0
-#       env:
-#         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#       with:
-#         args: >
-#          -Dsonar.organization='migracaodotnetforms'
-#          -Dsonar.projectKey=${{ github.event.repository.name }}
-#          -Dsonar.verbose=true
-#          -Dsonar.exclusions=**/bin/**/*,**/obj/**/*,**/packages/**/*,**/test/**/*
+      - name: Mostrar localização do artefato gerado
+        run: |
+          echo "Arquivos gerados:"
+          find target -type f \( -name "*.jar" -o -name "*.war" \)
 
-#     # Save artifacts
-#     - name: Zip all build outputs
-#       run: |
-#         $zipPath = "build-artifacts.zip"
-#         $outputDirs = Get-ChildItem -Path . -Recurse -Directory -Filter "bin" | ForEach-Object {
-#           "$($_.FullName)\${{ inputs.build_configuration }}"
-#         } | Where-Object { Test-Path $_ }
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-artifacts
+          path: |
+            target/*.jar
+            target/*.war
 
-#         if (-not $outputDirs) {
-#           Write-Error "Nenhum diretório de build encontrado."
-#         }
-
-#         Compress-Archive -Path $outputDirs -DestinationPath $zipPath
-#       shell: pwsh
-
-
-#     # Upload artifacts
-#     - name: Upload Build Artifacts
-#       uses: actions/upload-artifact@v4
-#       with:
-#         name: Build-Artifacts
-#         path: build-artifacts.zip
-
-
-
+     
