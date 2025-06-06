@@ -38,7 +38,7 @@ jobs:
           <distributionManagement>\n\
             <repository>\n\
               <id>github</id>\n\
-              <url>https://maven.pkg.github.com/AndressaFontes/${{github.repository_owner}}${{ github.event.repository.name }}</url>\n\
+              <url>https://maven.pkg.github.com/AndressaFontes/${{github.repository_owner}}/${{ github.event.repository.name }}</url>\n\
             </repository>\n\
           </distributionManagement>' pom.xml
 
