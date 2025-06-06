@@ -1,35 +1,38 @@
+name: Deploy Java Artifacts to GitHub Packages
+
 on:
   workflow_call:
-    inputs:
-      build_configuration:
-        description: 'Configuração de build (Debug ou Release)'
-        required: true
-        default: 'Release'
-        type: string
+  
 jobs:
-    checkout:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout código
-          uses: actions/checkout@v4
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
 
-        - name: dowload java artifacts
-          uses: actions/download-artifact@v4
-          with:
-           name: java-artifacts
-
-        - name: Configurar Github Packages
-          run: mvn deploy
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-     - name: Build da imagem Docker
-        uses: docker/build-push-action@v5
+      - name: Download Java artifacts
+        uses: actions/download-artifact@v4
         with:
-          context: .
-          file: ./Dockerfile
-          push: false
-   
-    
-      
-   
+          name: java-artifacts
+
+      - name: Configurar Maven settings.xml para GitHub Packages
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+            </servers>
+          </settings>" > ~/.m2/settings.xml
+
+      - name: Deploy para o GitHub Packages
+        run: mvn deploy -DskipTests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+
