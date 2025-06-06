@@ -3,7 +3,7 @@ name: Deploy Java Artifacts to GitHub Packages .
 on:
   workflow_call:
     secrets:
-      GITHUB_TOKEN:
+      GH_PACKAGES_TOKEN:
         description: 'Token de autenticação do GitHub'
         required: true
   
@@ -35,7 +35,7 @@ jobs:
       - name: Deploy para o GitHub Packages
         run: mvn deploy -DskipTests
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
 
