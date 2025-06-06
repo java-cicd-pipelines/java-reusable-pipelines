@@ -42,11 +42,13 @@ jobs:
             </servers>
           </settings>" > ~/.m2/settings.xml
 
-
-      - name: Deploy para o GitHub Packages
-        run: mvn deploy -DskipTests -X
+      - name: Publicar artefatos no GitHub Packages
+        run: mvn deploy -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+
+
+
 
 
 
