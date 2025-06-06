@@ -43,10 +43,14 @@ jobs:
           </settings>" > ~/.m2/settings.xml
 
 
-      - name: Deploy para o GitHub Packages
-        run: mvn deploy -DskipTests -X
+      - name: Publicar no GitHub Packages (Maven)
+        shell: bash
+        run: |
+          ./mvnw deploy -DskipTests --settings settings.xml \
+            -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/${{ github.repository }}
+        working-directory: ${{ env.MAVEN_DIR }}
         env:
-          GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUTH_PACKAGEJ_TOKEN: ${{ secrets.AUTH_PACKAGEJ_TOKEN }}
 
 
 
