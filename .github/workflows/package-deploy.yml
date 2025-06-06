@@ -38,11 +38,7 @@ jobs:
             </servers>
           </settings>" > ~/.m2/settings.xml
 
-      - name: Publicar artefatos no GitHub Packages
-        run: mvn deploy -DskipTests
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          AUTHENTICATOR_G_TOKEN: ${{ secrets.GH_PACKAGEJ_TOKEN }}
+      
 
 
 
