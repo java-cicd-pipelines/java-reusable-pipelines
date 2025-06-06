@@ -33,15 +33,24 @@ jobs:
           </settings>" > ~/.m2/settings.xml
 
       - name: Configurar distributionManagement no pom.xml
-        run: |
-           xmlstarlet ed -L \
-            -s "/project" -t elem -n "distributionManagement" -v "" \
-            -s "/project/distributionManagement" -t elem -n "repository" -v "" \
-            -s "/project/distributionManagement/repository" -t elem -n "id" -v "github" \
-            -s "/project/distributionManagement/repository" -t elem -n "name" -v "GitHub Packages" \
-            -s "/project/distributionManagement/repository" -t elem -n "url" -v "https://maven.pkg.github.com/${GITHUB_REPOSITORY}" \
-            pom.xml
+        run: 
+          GITHUB_USER="${{ github.actor }}"
+          GITHUB_REPO=$(basename -s .git `git config --get remote.origin.url`)
+          POM_FILE="pom.xml"
 
+          if grep -q "<distributionManagement>" "$POM_FILE"; then
+            echo " O arquivo pom.xml já possui <distributionManagement>."
+          else
+            echo " Adicionando <distributionManagement> ao pom.xml..."
+            sed -i '/<\/project>/i\
+          <distributionManagement>\
+            <repository>\
+              <id>github</id>\
+              <url>https://maven.pkg.github.com/'"$GITHUB_USER"'/'"$GITHUB_REPO"'</url>\
+            </repository>\
+          </distributionManagement>' "$POM_FILE"
+                  fi
+           
       - name: Deploy para o GitHub Packages
         run: mvn deploy -DskipTests
         env:
