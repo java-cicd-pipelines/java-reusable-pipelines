@@ -31,6 +31,15 @@ jobs:
               </server>
             </servers>
           </settings>" > ~/.m2/settings.xml
+
+      - name: Configurar distribuição do Maven
+        run: |
+          sed -i '/<\/project>/i\ "<distributionManagement>
+            <repository>
+              <id>github</id>
+              <url>https://maven.pkg.github.com/AndressaFontes/${{ github.repository_owner }}/${{ github.event.repository.name }}</url>
+            </repository>
+          </distributionManagement>" > pom.xml
            
       - name: Deploy para o GitHub Packages
         run: mvn deploy -DskipTests
