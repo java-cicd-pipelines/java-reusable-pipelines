@@ -42,8 +42,11 @@ jobs:
             </repository>\n\
           </distributionManagement>' pom.xml
 
+      - name: download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: java-artifacts
 
-           
       - name: Deploy para o GitHub Packages
         run: mvn deploy -DskipTests
         env:
