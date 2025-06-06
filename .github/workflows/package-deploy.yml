@@ -1,4 +1,4 @@
-name: Deploy Java Artifacts to GitHub Packages
+name: Deploy Java Artifacts to GitHub Packages .
 
 on:
   workflow_call:
