@@ -45,8 +45,8 @@ jobs:
       - name: Publicar artefatos no GitHub Packages
         run: mvn deploy -DskipTests
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-
+          GITHUB_ACTOR: ${{ github.actor }}
+          AUTHENTICATOR_G_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
 
 
