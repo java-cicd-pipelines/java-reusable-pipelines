@@ -46,13 +46,13 @@ jobs:
         run: |
           docker push ${{ secrets.AZURE_ACR_URL }}/meuapp-java:latest
 
-      - name: Deploy para App Service (for containers)
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ secrets.AZURE_APPSERVICE }}
-          slot-name: 'production'
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          images: ${{ secrets.AZURE_ACR_URL }}/meuapp-java:latest
+    #   - name: Deploy para App Service (for containers)
+    #     uses: azure/webapps-deploy@v3
+    #     with:
+    #       app-name: ${{ secrets.AZURE_APPSERVICE }}
+    #       slot-name: 'production'
+    #       publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+    #       images: ${{ secrets.AZURE_ACR_URL }}/meuapp-java:latest
 
 
      
