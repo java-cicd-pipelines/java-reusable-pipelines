@@ -12,9 +12,6 @@ on:
       AZURE_ACR_PASS:
         description: 'Senha do Azure Container Registry'
         required: true
-      AZURE_APPSERVICE:
-        description: 'Nome do App Service no Azure'
-        required: true
 
 jobs:
   deploy:
