@@ -37,11 +37,11 @@ jobs:
 
       - name: Build da imagem Docker
         run: |
-          docker build -t ${{ secrets.AZURE_ACR_URL }}/meuapp-java:latest .
+          docker build -t ${{ secrets.AZURE_ACR_URL }}/org.cicdpipelines.javawebapp:latest .
 
       - name: Push da imagem
         run: |
-          docker push ${{ secrets.AZURE_ACR_URL }}/meuapp-java:latest
+          docker push ${{ secrets.AZURE_ACR_URL }}/org.cicdpipelines.javawebapp:latest
 
     #   - name: Deploy para App Service (for containers)
     #     uses: azure/webapps-deploy@v3
