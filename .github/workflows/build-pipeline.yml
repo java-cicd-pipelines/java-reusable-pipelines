@@ -10,9 +10,7 @@ on:
     secrets:
       SONAR_TOKEN:
         description: 'Token de autenticação do SonarQube'
-        required: true
-
-      
+        required: true 
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,7 +25,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: ${{ env.JAVA_VERSION }}
+          java-version: ${{ vars.JAVA_VERSION }}
 
       - name: Instalar Maven
         uses: stCarolas/setup-maven@v4
