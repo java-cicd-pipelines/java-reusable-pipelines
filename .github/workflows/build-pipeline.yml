@@ -2,11 +2,6 @@ name: Java Reusable Pipeline
 
 on:
   workflow_call:
-    inputs:
-      maven_version:
-        type: string
-        description: 'Versão do Maven a ser usada'
-        required: true
     secrets:
       SONAR_TOKEN:
         description: 'Token de autenticação do SonarQube'
@@ -30,7 +25,7 @@ jobs:
       - name: Instalar Maven
         uses: stCarolas/setup-maven@v4
         with:
-          maven-version: ${{inputs.maven_version}}
+          maven-version: ${{vars.MAVEN_VERSION}}
 
       - name: Executar testes (unitários e integração)
         run: mvn clean verify
