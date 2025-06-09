@@ -43,14 +43,6 @@ jobs:
         env:
           AUTH_TOKEN: ${{ secrets.GITHUB.TOKEN }}
 
-      - name: upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: java-artifacts
-          path: |
-            target/*.jar
-            target/*.war
-
 
       
 
