@@ -14,10 +14,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: java-artifacts
+      - name: Build com Maven
+        run: mvn clean package
 
       - name: Criar Dockerfile se não existir
         run: |
