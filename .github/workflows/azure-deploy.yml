@@ -21,35 +21,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Garante que todo o histórico do repositório seja baixado
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Build WAR com Maven
-        run: mvn clean package
+          fetch-depth: 0 
 
       - name: Login no ACR
         run: echo "${{ secrets.AZURE_ACR_PASS }}" | docker login ${{ secrets.AZURE_ACR_URL }} -u ${{ secrets.AZURE_ACR_LOGIN }} --password-stdin
 
-      - name: Build da imagem Docker
-        run: |
-          docker build -t ${{ secrets.AZURE_ACR_URL }}/org.cicdpipelines.javawebapp:latest .
-
       - name: Push da imagem
         run: |
           docker push ${{ secrets.AZURE_ACR_URL }}/org.cicdpipelines.javawebapp:latest
-
-    #   - name: Deploy para App Service (for containers)
-    #     uses: azure/webapps-deploy@v3
-    #     with:
-    #       app-name: ${{ secrets.AZURE_APPSERVICE }}
-    #       slot-name: 'production'
-    #       publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-    #       images: ${{ secrets.AZURE_ACR_URL }}/meuapp-java:latest
 
 
      
