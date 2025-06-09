@@ -3,10 +3,6 @@ name: Java Reusable Pipeline
 on:
   workflow_call:
     inputs:
-      java_version:
-        description: 'Versão do Java a ser usada'
-        type: string
-        required: true
       maven_version:
         type: string
         description: 'Versão do Maven a ser usada'
@@ -31,7 +27,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: ${{ inputs.java_version }}
+          java-version: ${{ env.JAVA_VERSION }}
 
       - name: Instalar Maven
         uses: stCarolas/setup-maven@v4
