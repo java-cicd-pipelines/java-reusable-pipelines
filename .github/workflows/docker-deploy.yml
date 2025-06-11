@@ -14,10 +14,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Download-artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: java-artifacts
+      - name: Baixar artefato do GitHub Packages
+        run: |
+          mvn dependency:get \
+            -Dartifact=org.cicdpipelines:javawebapp:0.0.1 \
+            -DrepoUrl=https://maven.pkg.github.com/${{ github.repository_owner }}/${{ github.event.repository.name }} \
+            -DremoteRepositories=github::default::https://maven.pkg.github.com/${{ github.repository_owner }}/${{ github.event.repository.name }} \
+            -Dtransitive=false \
+            -Ddest=target/app.jar \
+            -s $GITHUB_WORKSPACE/.github/maven-settings.xml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Criar Dockerfile se não existir
         run: |
@@ -39,3 +46,5 @@ jobs:
       - name: Push Docker image
         run: |
           docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
+          
+      
