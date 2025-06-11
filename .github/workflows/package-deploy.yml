@@ -50,8 +50,11 @@ jobs:
       
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
-        with:
+        with: 
           name: java-artifacts
+          path: |
+            target/*.jar
+            target/*.war
 
       
 
