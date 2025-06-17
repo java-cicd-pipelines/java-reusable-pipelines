@@ -1,60 +1,49 @@
-name: Deploy Java Artifacts to GitHub Packages .
+# name: Deploy Java Artifacts to GitHub Packages .
 
-on:
-  workflow_call:
+# on:
+#   workflow_call:
   
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout código
-        uses: actions/checkout@v4
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout código
+#         uses: actions/checkout@v4
 
-      - name: Download Java artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: java-artifacts
+#       - name: Download Java artifacts
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: java-artifacts
 
-      - name: Configurar distribuição do Maven
-        run: |
-          sed -i '/<\/project>/i \
-          <distributionManagement>\n\
-            <repository>\n\
-              <id>github</id>\n\
-              <url>https://maven.pkg.github.com/${{github.repository_owner}}/${{ github.event.repository.name }}</url>\n\
-            </repository>\n\
-          </distributionManagement>' pom.xml
+#       - name: Configurar distribuição do Maven
+#         run: |
+#           sed -i '/<\/project>/i \
+#           <distributionManagement>\n\
+#             <repository>\n\
+#               <id>github</id>\n\
+#               <url>https://maven.pkg.github.com/${{github.repository_owner}}/${{ github.event.repository.name }}</url>\n\
+#             </repository>\n\
+#           </distributionManagement>' pom.xml
 
-      - name: Configurar Maven settings.xml para GitHub Packages
-        run: |
-          mkdir -p ~/.m2
-          echo "<settings>
-            <servers>
-              <server>
-                <id>github</id>
-                <username>${{ github.actor }}</username>
-                <password>${{ secrets.GITHUB_TOKEN }}</password>
-              </server>
-            </servers>
-          </settings>" > ~/.m2/settings.xml
+#       - name: Configurar Maven settings.xml para GitHub Packages
+#         run: |
+#           mkdir -p ~/.m2
+#           echo "<settings>
+#             <servers>
+#               <server>
+#                 <id>github</id>
+#                 <username>${{ github.actor }}</username>
+#                 <password>${{ secrets.GITHUB_TOKEN }}</password>
+#               </server>
+#             </servers>
+#           </settings>" > ~/.m2/settings.xml
 
-      - name: Deploy do artefato para o GitHub Packages
-        run: mvn deploy --settings ~/.m2/settings.xml
-        env:
-          AUTH_TOKEN: ${{ secrets.GITHUB.TOKEN }}
+#       - name: Deploy do artefato para o GitHub Packages
+#         run: mvn deploy --settings ~/.m2/settings.xml
+#         env:
+#           AUTH_TOKEN: ${{ secrets.GITHUB.TOKEN }}
 
-      - name: download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: java-artifacts
       
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with: 
-          name: java-artifact2
-          path: |
-            target/*.jar
-            target/*.war
 
       
 
