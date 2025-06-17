@@ -17,8 +17,8 @@ jobs:
       - name: Download artefatos Java
         uses: actions/download-artifact@v4
         with:
-          name: java-artifact
-          path: target
+          name: java-artifacts
+          path: target/*.jar
 
       - name: Criar Dockerfile se não existir
         run: |
