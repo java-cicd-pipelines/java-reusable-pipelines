@@ -82,6 +82,6 @@ jobs:
           name: java-artifacts
           path: |
             target/*.jar
-            target/*.war
+     
 
      
