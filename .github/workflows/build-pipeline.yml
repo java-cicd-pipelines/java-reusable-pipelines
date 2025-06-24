@@ -28,7 +28,7 @@ jobs:
           maven-version: ${{vars.MAVEN_VERSION}}
 
       - name: Executar testes (unitários e integração)
-        run: mvn clean verify sonar:sonar -Dsonar.projectKey=codenestlab
+        run: mvn clean verify 
 
       - name: Análise com SonarQube
         env:
