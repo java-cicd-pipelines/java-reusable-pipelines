@@ -28,14 +28,14 @@ jobs:
           maven-version: ${{vars.MAVEN_VERSION}}
 
       - name: Executar testes (unitários e integração)
-        run: mvn clean verify
+        run: mvn clean verify sonar:sonar -Dsonar.projectKey=codenestlab
 
       - name: Análise com SonarQube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn sonar:sonar \
-            -Dsonar.projectKey=${{ github.repository.owner}} \
+            -Dsonar.projectKey=${{ github.repository_owner}} \
             -Dsonar.organization=${{ github.repository_owner }} \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=$SONAR_TOKEN
