@@ -1,47 +1,39 @@
-name: Deploy to Azure 
+name: Deploy to Azure Web App
 
 on:
-    workflow_call:
-     secrets:
-      AZURE_ACR_URL:
-        description: 'URL do Azure Container Registry'
-        required: true
-      AZURE_ACR_LOGIN:
-        description: 'Login do Azure Container Registry'
-        required: true
-      AZURE_ACR_PASS:
-        description: 'Senha do Azure Container Registry'
-        required: true
-      AZURE_APPSERVICE:
-        description: 'Nome do Azure App Service'
-        required: true
-      AZURE_PUBLISH_PROFILE:
-        description: 'Publish Profile do Azure App Service'
-        required: true
+  workflow_call:
+
+env:
+  REGISTRY_NAME: ${{ secrets.REGISTRY_NAME }}
+  APP_NAME: ${{ secrets.APP_NAME }}
+  RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
+  IMAGE_NAME: meuapp
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v1
         with:
-          fetch-depth: 0 
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Login no ACR
-        run: echo "${{ secrets.AZURE_ACR_PASS }}" | docker login ${{ secrets.AZURE_ACR_URL }} -u ${{ secrets.AZURE_ACR_LOGIN }} --password-stdin
+      - name: Azure CLI - Login ACR
+        run: az acr login --name $REGISTRY_NAME
 
-      - name: Push da imagem
+      - name: Build and Push Docker image
         run: |
-          docker push ${{ secrets.AZURE_ACR_URL }}/org.cicdpipelines.javawebapp:latest
-      
-      - name: Deploy para Azure App Service
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ secrets.AZURE_APPSERVICE }}
-          slot-name: 'production'
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          images: ${{ secrets.AZURE_ACR_URL }}/org.cicdpipelines.javawebapp:latest
+          docker build -t $REGISTRY_NAME.azurecr.io/$IMAGE_NAME:latest .
+          docker push $REGISTRY_NAME.azurecr.io/$IMAGE_NAME:latest
 
-
+      - name: Deploy to Web App
+        run: |
+          az webapp config container set \
+            --name $APP_NAME \
+            --resource-group $RESOURCE_GROUP \
+            --docker-custom-image-name $REGISTRY_NAME.azurecr.io/$IMAGE_NAME:latest \
+            --docker-registry-server-url https://$REGISTRY_NAME.azurecr.io
